@@ -4,24 +4,30 @@ import { ref } from "vue";
 const columns = ref(15);
 const rows = ref(8);
 
+const gridModel = defineModel<number[][]>({ required: true });
+
 const getRandomHexColor = (): string => {
   const val = ["#ffffff", "#555555"][Math.floor(Math.random() * 2)];
   return val ? val : "#3523324";
 };
-
-const getRandomVisibility = (): string => {
-  return Math.random() <= 0.2 ? "hidden" : "visible";
-};
 </script>
 
 <template>
-  <div class="grid-container" :style="{ '--cols': columns }">
-    <div
-      v-for="i in columns * rows"
-      :key="i"
-      class="box"
-      :style="{ 'background-color': getRandomHexColor(), visibility: getRandomVisibility() }"
-    ></div>
+  <div
+    class="grid-container"
+    :style="{ '--cols': gridModel[0]!.length, '--rows': gridModel!.length }"
+  >
+    <template v-for="(row, rowIndex) in gridModel">
+      <div
+        v-for="(col, colIndex) in row"
+        :key="`${rowIndex}-${colIndex}`"
+        class="box"
+        :style="{
+          'background-color': '#555555',
+          visibility: col === -1 ? 'visible' : 'hidden',
+        }"
+      ></div>
+    </template>
   </div>
 </template>
 
@@ -30,8 +36,9 @@ const getRandomVisibility = (): string => {
   position: absolute;
   top: 100px;
   left: 100px;
-  display: grid; /* Initializes the grid context */
-  grid-template-columns: repeat(var(--cols), 1fr); /* Creates 3 equal columns */
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
   z-index: -1;
 }
 
