@@ -29,15 +29,17 @@ for (let i = 0; i <= 9; i++) {
     index++;
   }
 }
-while (dominoes.value.length > 10) {
-  dominoes.value.splice(Math.round(Math.random() * dominoes.value.length), 1);
-}
+// while (dominoes.value.length > 10) {
+//   dominoes.value.splice(Math.round(Math.random() * dominoes.value.length), 1);
+// }
 
 const rows = 5;
 const cols = 10;
 
 const grid = ref<number[][]>(Array.from({ length: rows }, () => new Array<number>(cols).fill(-1)));
 const dominoPlacements: { [key: number]: DominoCoordinate } = {};
+
+const pipsGrid = ref<InstanceType<typeof PipsGrid> | null>(null);
 
 interface DominoCoordinate {
   left: Position;
@@ -48,9 +50,15 @@ const calculateGridSquares = (
   centerPosition: Position,
   rotation: Rotation,
   dominoSize: number,
-  gridTopLeft: Position,
 ): DominoCoordinate => {
-  const { x: gridX, y: gridY } = gridTopLeft;
+  const gridRect = getGridBoundingBox();
+  if (!gridRect) {
+    return {
+      left: { x: 0, y: 0 },
+      right: { x: 0, y: 0 },
+    };
+  }
+  const { x: gridX, y: gridY } = gridRect;
   const { x: centerX, y: centerY } = centerPosition;
   const left = {
     x: Math.floor((centerX - gridX) / dominoSize),
@@ -72,10 +80,23 @@ function removeDomino(gridSquares: DominoCoordinate) {
   grid.value[right.y]![right.x] = -1;
 }
 
+const validPosition = (coordinates: Position): boolean => {
+  const { x, y } = coordinates;
+  return x >= 0 && x < cols && y >= 0 && y < rows;
+};
+
+const getGridBoundingBox = (): DOMRect | undefined =>
+  pipsGrid.value?.gridContainer?.getBoundingClientRect();
+
 function placeDomino(gridSquares: DominoCoordinate): boolean {
   const { left, right } = gridSquares;
-  console.log(grid.value, grid.value[left.y]![left.x], grid.value[right.y]![right.x]);
-  if (!grid.value || grid.value[left.y]![left.x] != -1 || grid.value[right.y]![right.x] != -1) {
+  if (
+    !grid.value ||
+    !validPosition(left) ||
+    !validPosition(right) ||
+    grid.value[left.y]![left.x] != -1 ||
+    grid.value[right.y]![right.x] != -1
+  ) {
     return true;
   }
   grid.value[left.y]![left.x] = 1;
@@ -90,11 +111,7 @@ function dominoChangedCallback(center: Position, dominoSize: number, dominoIdx: 
   if (!movedDomino || !newPosition) {
     return;
   }
-  const gridSquares = calculateGridSquares(center, movedDomino.rotation, dominoSize, {
-    x: 100,
-    y: 100,
-  });
-  console.log(gridSquares);
+  const gridSquares = calculateGridSquares(center, movedDomino.rotation, dominoSize);
   const currentDominoPlacement = dominoPlacements[dominoIdx];
   if (currentDominoPlacement) {
     removeDomino(currentDominoPlacement);
@@ -123,7 +140,7 @@ function dominoChangedCallback(center: Position, dominoSize: number, dominoIdx: 
       :key="domino.domino.id"
       @dominoChanged="(center, size) => dominoChangedCallback(center, size, index)"
     />
-    <PipsGrid v-model="grid" />
+    <PipsGrid ref="pipsGrid" v-model="grid" />
   </main>
 </template>
 

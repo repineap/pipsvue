@@ -1,21 +1,25 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-const columns = ref(15);
-const rows = ref(8);
-
 const gridModel = defineModel<number[][]>({ required: true });
+
+const gridContainer = ref<HTMLElement | null>(null);
 
 const getRandomHexColor = (): string => {
   const val = ["#ffffff", "#555555"][Math.floor(Math.random() * 2)];
   return val ? val : "#3523324";
 };
+
+defineExpose({
+  gridContainer,
+});
 </script>
 
 <template>
   <div
     class="grid-container"
     :style="{ '--cols': gridModel[0]!.length, '--rows': gridModel!.length }"
+    ref="gridContainer"
   >
     <template v-for="(row, rowIndex) in gridModel">
       <div
@@ -34,8 +38,8 @@ const getRandomHexColor = (): string => {
 <style scoped>
 .grid-container {
   position: absolute;
-  top: 100px;
-  left: 100px;
+  top: round(nearest, 40% - (var(--rows) / 2 * var(--domino-size)), var(--domino-size));
+  left: round(nearest, 50% - (var(--cols) / 2 * var(--domino-size)), var(--domino-size));
   display: grid;
   grid-template-columns: repeat(var(--cols), 1fr);
   grid-template-rows: repeat(var(--rows), 1fr);
@@ -45,10 +49,11 @@ const getRandomHexColor = (): string => {
 .box {
   /*background-color: var(--color-background-soft);*/
   color: white;
-  width: 100px;
-  height: 100px;
+  width: var(--domino-size);
+  height: var(--domino-size);
   border: 5px solid lightgray;
   text-align: center;
   border-radius: 10%;
+  box-sizing: border-box;
 }
 </style>

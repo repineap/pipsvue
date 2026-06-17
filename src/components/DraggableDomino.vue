@@ -18,8 +18,9 @@ const el = ref<HTMLElement | null>(null);
 const dominoDiv = ref<HTMLElement | null>(null);
 const centerDot = ref<HTMLElement | null>(null);
 const rotationVal = ref(0);
+let dominoSize = 0;
 
-const snap = (val: number) => Math.round(val / 100) * 100;
+const snap = (val: number) => Math.round(val / dominoSize) * dominoSize;
 
 const wasDragged = ref(false);
 
@@ -39,6 +40,8 @@ const { style, position } = useDraggable(el, {
     wasDragged.value = false;
   },
   async onEnd(position, event) {
+    const { width, height } = dominoDiv.value!.getBoundingClientRect();
+    dominoSize = Math.min(width, height);
     const deltaX = Math.abs(event.clientX - startClientPosition.x);
     const deltaY = Math.abs(event.clientY - startClientPosition.y);
 
@@ -54,8 +57,7 @@ const { style, position } = useDraggable(el, {
     };
     dominoModel.value.position = { ...snapped_position };
     await nextTick();
-    const { width, height } = dominoDiv.value!.getBoundingClientRect();
-    emit("dominoChanged", calculateCenter(), Math.min(width, height));
+    emit("dominoChanged", calculateCenter(), dominoSize);
   },
 });
 
@@ -133,8 +135,8 @@ const handleClick = () => {
 
 <style scoped>
 .domino {
-  width: 200px;
-  height: 100px;
+  width: 2 * var(--domino-size);
+  height: var(--domino-size);
   transform-origin: 25% 50%;
   transition: transform 0.1s linear;
   position: fixed;
