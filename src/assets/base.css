@@ -35,7 +35,7 @@
 
   --section-gap: 160px;
 
-  --domino-size: 100px;
+  --domino-size: 75px;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -1,7 +1,27 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
+import type { Region } from "./types/domino";
 
-const gridModel = defineModel<number[][]>({ required: true });
+const grid = defineModel<number[][]>("grid", { required: true });
+const regions = defineModel<Region[]>("regions", { required: true });
+
+const rows = computed(() => grid.value.length);
+const columns = computed(() => (!grid.value[0] ? 0 : grid.value[0].length));
+
+const colorMap = computed(() => {
+  const map = Array.from({ length: rows.value }, () =>
+    new Array<string>(columns.value).fill("EMPTY"),
+  );
+
+  for (const region of regions.value) {
+    for (const square of region.squares) {
+      if (map[square.y]) {
+        map[square.y]![square.x] = region.regionColor;
+      }
+    }
+  }
+  return map;
+});
 
 const gridContainer = ref<HTMLElement | null>(null);
 
@@ -16,19 +36,16 @@ defineExpose({
 </script>
 
 <template>
-  <div
-    class="grid-container"
-    :style="{ '--cols': gridModel[0]!.length, '--rows': gridModel!.length }"
-    ref="gridContainer"
-  >
-    <template v-for="(row, rowIndex) in gridModel">
+  <div class="grid-container" :style="{ '--cols': columns, '--rows': rows }" ref="gridContainer">
+    <template v-for="(row, rowIndex) in grid">
       <div
         v-for="(col, colIndex) in row"
         :key="`${rowIndex}-${colIndex}`"
         class="box"
         :style="{
-          'background-color': '#555555',
-          visibility: col === -1 ? 'visible' : 'hidden',
+          'background-color': colorMap[rowIndex]?.[colIndex] || 'EMPTY',
+          visibility:
+            (colorMap[rowIndex]?.[colIndex] || 'EMPTY') !== 'EMPTY' ? 'visible' : 'hidden',
         }"
       ></div>
     </template>

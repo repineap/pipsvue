@@ -22,3 +22,25 @@ export interface DominoPosition {
   position: Position;
   isValid: boolean;
 }
+
+export enum RegionType {
+  Blank,
+  LessThan,
+  GreaterThan,
+  SumsTo,
+  AllEqual,
+  AllDifferent,
+}
+
+export interface Region {
+  squares: Position[];
+  regionType: RegionType;
+  regionValue: number;
+  regionColor: string;
+  isValid?: boolean;
+}
+
+export interface GridModel {
+  regions: Region[];
+  grid: number[][];
+}
