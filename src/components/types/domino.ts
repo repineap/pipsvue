@@ -40,6 +40,23 @@ export interface Region {
   isValid?: boolean;
 }
 
+export function regionToString(region: Region): string {
+  switch (region.regionType) {
+    case RegionType.Blank:
+      return "";
+    case RegionType.LessThan:
+      return `<${region.regionValue}`;
+    case RegionType.GreaterThan:
+      return `>${region.regionValue}`;
+    case RegionType.SumsTo:
+      return `${region.regionValue}`;
+    case RegionType.AllEqual:
+      return `=`;
+    case RegionType.AllDifferent:
+      return `!=`;
+  }
+}
+
 export interface GridModel {
   regions: Region[];
   grid: number[][];

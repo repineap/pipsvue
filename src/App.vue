@@ -91,7 +91,7 @@ function generateRandomMutedHex(): string {
 
 const colors: string[] = [];
 for (let hue = 0; hue < 360; hue += 15) {
-  colors.push(hslToHex(hue, 30, 50));
+  colors.push(hslToHex(hue, 50, 50));
 }
 
 const popRandomColor = (): string => {

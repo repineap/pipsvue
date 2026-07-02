@@ -35,10 +35,10 @@
 
   --section-gap: 160px;
 
-  --domino-size: 75px;
+  --domino-size: 100px;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
     --color-background: var(--vt-c-black);
     --color-background-soft: var(--vt-c-black-soft);

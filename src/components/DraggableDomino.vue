@@ -108,7 +108,7 @@ const handleClick = () => {
     :style="[
       style,
       `opacity: ${dominoModel.isValid ? 0.9 : 1}`,
-      `z-index: ${dominoModel.isValid ? 0 : 9999}`,
+      // `z-index: ${dominoModel.isValid ? 0 : 9999}`,
     ]"
     @click="handleClick"
     class="draggable-wrapper"
@@ -142,6 +142,7 @@ const handleClick = () => {
   position: fixed;
   cursor: pointer;
   user-select: none;
+  z-index: 1;
 }
 
 .draggable-wrapper {

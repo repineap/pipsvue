@@ -146,7 +146,7 @@ const rightPipCoordinates = computed(() => {
   stroke: #000000;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   .bg {
     opacity: 0.9;
     fill: #202120;
