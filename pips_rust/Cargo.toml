@@ -1,0 +1,9 @@
+[package]
+name = "pips_rust"
+version = "0.1.0"
+edition = "2024"
+
+
+[dependencies]
+wasm-bindgen = "0.2"
+rand = "0.9"
