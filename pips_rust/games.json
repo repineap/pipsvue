@@ -1,0 +1,268 @@
+[
+  {
+    "dominoes": [
+      [2, 0],
+      [6, 4],
+      [0, 0],
+      [2, 2],
+      [5, 5],
+      [0, 6],
+      [4, 2],
+      [6, 5],
+      [0, 4],
+      [1, 5],
+      [6, 6],
+      [4, 1],
+      [0, 3],
+      [1, 2],
+      [3, 4]
+    ],
+    "regions": [
+      {
+        "squares": [
+          [0, 1],
+          [6, 5],
+          [6, 6]
+        ],
+        "region_type": "B",
+        "region_value": 0
+      },
+      {
+        "squares": [[6, 0]],
+        "region_type": ">",
+        "region_value": 4
+      },
+      {
+        "squares": [
+          [6, 1],
+          [7, 1],
+          [6, 2]
+        ],
+        "region_type": "=",
+        "region_value": 0
+      },
+      {
+        "squares": [
+          [8, 1],
+          [8, 2]
+        ],
+        "region_type": "+",
+        "region_value": 0
+      },
+      {
+        "squares": [[7, 2]],
+        "region_type": "<",
+        "region_value": 4
+      },
+      {
+        "squares": [
+          [0, 2],
+          [1, 2]
+        ],
+        "region_type": "+",
+        "region_value": 11
+      },
+      {
+        "squares": [
+          [0, 3],
+          [1, 3],
+          [2, 3],
+          [0, 4]
+        ],
+        "region_type": "+",
+        "region_value": 0
+      },
+      {
+        "squares": [
+          [3, 3],
+          [4, 3]
+        ],
+        "region_type": "=",
+        "region_value": 0
+      },
+      {
+        "squares": [
+          [5, 3],
+          [4, 4],
+          [5, 4]
+        ],
+        "region_type": "=",
+        "region_value": 0
+      },
+      {
+        "squares": [[3, 4]],
+        "region_type": ">",
+        "region_value": 4
+      },
+      {
+        "squares": [
+          [6, 3],
+          [6, 4]
+        ],
+        "region_type": "+",
+        "region_value": 4
+      },
+      {
+        "squares": [
+          [1, 4],
+          [2, 4]
+        ],
+        "region_type": "+",
+        "region_value": 5
+      },
+      {
+        "squares": [
+          [1, 5],
+          [1, 6],
+          [2, 6]
+        ],
+        "region_type": "+",
+        "region_value": 13
+      },
+      {
+        "squares": [[7, 6]],
+        "region_type": "+",
+        "region_value": 4
+      }
+    ]
+  },
+  {
+    "dominoes": [
+      [4, 0],
+      [6, 6],
+      [4, 4],
+      [1, 1],
+      [4, 3],
+      [2, 4],
+      [4, 5],
+      [2, 6],
+      [3, 6]
+    ],
+    "regions": [
+      {
+        "squares": [
+          [0, 0],
+          [0, 1],
+          [0, 2]
+        ],
+        "region_type": "=",
+        "region_value": 0
+      },
+      {
+        "squares": [[1, 0]],
+        "region_type": "+",
+        "region_value": 5
+      },
+      {
+        "squares": [[2, 0]],
+        "region_type": "B",
+        "region_value": 0
+      },
+      {
+        "squares": [
+          [2, 1],
+          [1, 2],
+          [2, 2]
+        ],
+        "region_type": "=",
+        "region_value": 0
+      },
+      {
+        "squares": [
+          [4, 1],
+          [4, 2]
+        ],
+        "region_type": "=",
+        "region_value": 0
+      },
+      {
+        "squares": [[6, 0]],
+        "region_type": "<",
+        "region_value": 2
+      },
+      {
+        "squares": [
+          [7, 0],
+          [8, 0]
+        ],
+        "region_type": "=",
+        "region_value": 0
+      },
+      {
+        "squares": [[6, 1]],
+        "region_type": "+",
+        "region_value": 4
+      },
+      {
+        "squares": [
+          [6, 2],
+          [7, 2]
+        ],
+        "region_type": "=",
+        "region_value": 0
+      },
+      {
+        "squares": [
+          [8, 1],
+          [8, 2]
+        ],
+        "region_type": "+",
+        "region_value": 8
+      }
+    ]
+  },
+  {
+    "dominoes": [
+      [0, 5],
+      [6, 3],
+      [5, 1],
+      [3, 2],
+      [2, 2],
+      [2, 1]
+    ],
+    "regions": [
+      {
+        "squares": [
+          [1, 0],
+          [1, 1],
+          [2, 0]
+        ],
+        "region_type": ">",
+        "region_value": 13
+      },
+      {
+        "squares": [[3, 0]],
+        "region_type": "+",
+        "region_value": 3
+      },
+      {
+        "squares": [[1, 2]],
+        "region_type": ">",
+        "region_value": 0
+      },
+      {
+        "squares": [
+          [0, 0],
+          [1, 4]
+        ],
+        "region_type": "B",
+        "region_value": 0
+      },
+      {
+        "squares": [
+          [2, 4],
+          [3, 2],
+          [3, 3],
+          [3, 4]
+        ],
+        "region_type": "=",
+        "region_value": 0
+      },
+      {
+        "squares": [[4, 4]],
+        "region_type": "<",
+        "region_value": 2
+      }
+    ]
+  }
+]
