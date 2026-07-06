@@ -72,9 +72,9 @@ fn main() {
 
     let mut pips_games: Vec<PipsGame> = loaded_games.into_iter().filter_map(|g| g.into()).collect();
 
-    let puzzle_3 = pips_games.get_mut(2).unwrap();
+    let puzzle_3 = pips_games.get_mut(1).unwrap();
 
-    let (_, path) = solve_game(puzzle_3, 5);
+    let (_, path) = solve_game(puzzle_3, 3);
     for domino_move in path {
         puzzle_3.make_move(&domino_move);
         println!("{}", domino_move);

@@ -1,7 +1,7 @@
 use std::{
+    cmp::min,
     collections::HashSet,
     fmt::{self, Display},
-    ops::Shl,
 };
 
 pub const EMPTY_SQUARE: u32 = u32::MAX;
@@ -168,11 +168,6 @@ impl Board {
         if let Some(elem) = self.get_mut(row, col) {
             let original = *elem;
             *elem = val;
-            if val == EMPTY_SQUARE {
-                self.empty(row, col)
-            } else {
-                self.fill(row, col);
-            };
             return Some(original);
         }
         return None;
@@ -295,14 +290,13 @@ impl PipsGame {
     }
 
     fn get_squares_for_region(&self, region: &PipsRegion) -> Vec<u32> {
-        region
-            .squares
-            .iter()
-            .map(|s| self.board.get(s.x as usize, s.y as usize))
-            .flatten()
-            .filter(|v| **v <= MAX_DOMINO)
-            .copied()
-            .collect::<Vec<u32>>()
+        let mut region_squares: Vec<u32> = vec![];
+        for square in &region.squares {
+            if !self.board.is_open_point(*square) {
+                region_squares.push(*self.board.get_point(*square).unwrap());
+            }
+        }
+        region_squares
     }
 
     pub fn validate_regions(&self) -> Vec<(usize, RegionValidity)> {
@@ -374,8 +368,12 @@ impl PipsGame {
     }
 
     pub fn calculate_first_n_domino_moves(&self, n: usize) -> Vec<Move> {
-        // self.calculate_moves(&self.valid_dominoes.as_slice())
-        self.calculate_moves(&self.valid_dominoes.get(0..n).unwrap_or(&[]))
+        self.calculate_moves(
+            &self
+                .valid_dominoes
+                .get(0..min(n, self.valid_dominoes.len()))
+                .unwrap_or(&[]),
+        )
     }
 
     pub fn make_move(&mut self, domino_move: &Move) -> Option<(u32, u32)> {
@@ -390,6 +388,8 @@ impl PipsGame {
                 .board
                 .set_point(domino_move.right_coord, domino_move.right_val)
                 .expect("WEIRD STATE");
+            self.board.fill_point(domino_move.left_coord);
+            self.board.fill_point(domino_move.right_coord);
             self.valid_dominoes
                 .retain(|&idx| idx != domino_move.domino_idx);
             return Some((left_start_val, right_start_val));
@@ -414,6 +414,8 @@ impl PipsGame {
             .set_point(domino_move.left_coord, original_vals.0);
         self.board
             .set_point(domino_move.right_coord, original_vals.1);
+        self.board.empty_point(domino_move.left_coord);
+        self.board.empty_point(domino_move.right_coord);
         self.valid_dominoes.push(domino_move.domino_idx);
     }
 }

@@ -7,7 +7,7 @@ pub fn start_search(
     depth: u32,
     seen: &mut HashSet<Move>,
 ) -> (u32, Vec<Move>) {
-    let moves = pips_game.calculate_first_n_domino_moves(2);
+    let moves = pips_game.calculate_first_n_domino_moves(3);
 
     if depth == 0 || moves.is_empty() {
         return (pips_game.score_game(), vec![]);
@@ -66,7 +66,7 @@ pub fn solve_game(pips_game: &mut PipsGame, depth: u32) -> (bool, Vec<Move>) {
             }
             if let Some(last_move) = &final_path.pop() {
                 seen_set.clear();
-                seen.remove(&final_path);
+                // seen.remove(&final_path);
                 pips_game.undo_move(last_move, &(EMPTY_SQUARE, EMPTY_SQUARE));
             } else {
                 return (false, final_path);
