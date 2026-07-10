@@ -1,17 +1,12 @@
-use std::{fs, time::Instant};
-
-use serde::Deserialize;
-
 use crate::{
     game_v2::PipsGraph,
     loader::{LoadedGame, load_games},
-    // solver::solve_game,
+    solver::solve_game,
 };
 
-// mod game;
 mod game_v2;
 mod loader;
-// mod solver;
+mod solver;
 
 fn main() {
     let loaded_games: Vec<LoadedGame> = load_games("games.json");
@@ -21,17 +16,18 @@ fn main() {
         .map(|loaded| PipsGraph::new(loaded))
         .collect();
 
-    for graph in pips_games {
-        println!("{:?}", graph);
-    }
-
-    // let puzzle_3 = pips_games.get_mut(1).unwrap();
-
-    // let (_, path) = solve_game(puzzle_3, 3);
-    // for domino_move in path {
-    //     puzzle_3.make_move(&domino_move);
-    //     println!("{}", domino_move);
+    // for graph in pips_games {
+    //     println!("{:?}", graph);
     // }
+
+    let puzzle_3 = pips_games.get_mut(2).unwrap();
+
+    let (score, path) = solve_game(puzzle_3, 3);
+    println!("{}", score);
+    for domino_move in path {
+        puzzle_3.make_move(&domino_move);
+        println!("{}", domino_move);
+    }
     // println!("{}", puzzle_3.board);
 
     // println!(

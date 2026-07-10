@@ -1,11 +1,40 @@
-use std::{collections::HashMap, hash::Hash};
+use std::{
+    collections::HashMap,
+    fmt::{self, Display},
+    hash::Hash,
+};
 
 use crate::loader::LoadedGame;
+
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
+pub struct MoveHalf {
+    value: u32,
+    node_index: usize,
+    region: usize,
+}
+
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
+pub struct Move {
+    pub left: MoveHalf,
+    pub right: MoveHalf,
+    pub domino_idx: usize,
+}
+
+impl Display for Move {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "|{}|{}| at ({}, {})",
+            self.left.value, self.right.value, self.left.node_index, self.right.node_index
+        )
+    }
+}
 
 #[derive(Debug)]
 pub struct Domino {
     pub left: u32,
     pub right: u32,
+    pub valid: bool,
 }
 
 impl Into<Domino> for (u32, u32) {
@@ -13,6 +42,7 @@ impl Into<Domino> for (u32, u32) {
         Domino {
             left: self.0,
             right: self.1,
+            valid: true,
         }
     }
 }
@@ -21,7 +51,8 @@ impl Into<Domino> for (u32, u32) {
 pub struct Node {
     pub x: u32,
     pub y: u32,
-    pub v: Option<u32>,
+    pub value: Option<u32>,
+    pub region_idx: usize,
     pub left: Option<usize>,
     pub up: Option<usize>,
     pub right: Option<usize>,
@@ -49,17 +80,48 @@ impl Into<RegionType> for (String, u32) {
     }
 }
 
-#[derive(Debug)]
+const REGION_WIN_SCORE: u32 = 20;
+
+#[derive(Debug, PartialEq, Eq)]
+#[repr(u32)]
 pub enum RegionValidity {
-    Possible,
-    Invalid,
-    Solved,
+    Possible = 1,
+    Invalid = 0,
+    Solved = REGION_WIN_SCORE,
 }
 
 #[derive(Debug)]
 pub struct Region {
     pub region_type: RegionType,
     pub squares: Vec<usize>,
+}
+
+impl Region {
+    pub fn get_validity(&self, graph_nodes: &Vec<Node>) -> RegionValidity {
+        let values: Vec<u32> = self
+            .squares
+            .iter()
+            .map(|square| graph_nodes.get(*square).and_then(|node| node.value))
+            .flatten()
+            .collect();
+        let filled_region = values.len() == self.squares.len();
+        let condition_met = match self.region_type {
+            RegionType::Same => values.iter().any(|x| x != &values[0]),
+            RegionType::GreaterThan(v) => values.iter().sum::<u32>() > v,
+            RegionType::LessThan(v) => values.iter().sum::<u32>() < v,
+            RegionType::SumsTo(v) => values.iter().sum::<u32>() == v,
+            RegionType::Blank => true,
+        };
+        if !condition_met && filled_region {
+            RegionValidity::Invalid
+        } else {
+            if filled_region {
+                RegionValidity::Solved
+            } else {
+                RegionValidity::Possible
+            }
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -88,7 +150,7 @@ impl PipsGraph {
         let mut nodes = vec![];
         let mut nodes_map: HashMap<(u32, u32), usize> = HashMap::new();
         let mut regions = vec![];
-        for region in loaded_game.regions.iter().clone() {
+        for (region_idx, region) in loaded_game.regions.iter().clone().enumerate() {
             let mut nodes_idxs = vec![];
             for square in region.squares.clone() {
                 let (x, y) = square;
@@ -96,7 +158,8 @@ impl PipsGraph {
                 let new_node = Node {
                     x,
                     y,
-                    v: None,
+                    value: None,
+                    region_idx,
                     left,
                     up,
                     right,
@@ -133,6 +196,212 @@ impl PipsGraph {
                 .into_iter()
                 .map(|d| d.into())
                 .collect(),
+        }
+    }
+
+    pub fn make_move(&mut self, domino_move: &Move) -> bool {
+        let Move {
+            left:
+                MoveHalf {
+                    value: left_value,
+                    node_index: left_node_index,
+                    region: _region,
+                },
+            right:
+                MoveHalf {
+                    value: right_value,
+                    node_index: right_node_index,
+                    region: __region,
+                },
+            domino_idx,
+        } = domino_move;
+        let (left, right) = if *left_node_index < *right_node_index {
+            let (left_side, right_side) = self.nodes.split_at_mut(*right_node_index);
+            (&mut left_side[*left_node_index], &mut right_side[0])
+        } else {
+            let (left_side, right_side) = self.nodes.split_at_mut(*left_node_index);
+            (&mut right_side[0], &mut left_side[*right_node_index])
+        };
+
+        if left.value.is_none() && right.value.is_none() {
+            left.value = Some(*left_value);
+            right.value = Some(*right_value);
+            if let Some(domino) = self.dominoes.get_mut(*domino_idx) {
+                domino.valid = false;
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn undo_move(&mut self, domino_move: &Move) -> bool {
+        let Move {
+            left:
+                MoveHalf {
+                    value: _left_value,
+                    node_index: left_node_index,
+                    region: _region,
+                },
+            right:
+                MoveHalf {
+                    value: _right_value,
+                    node_index: right_node_index,
+                    region: __region,
+                },
+            domino_idx,
+        } = domino_move;
+        let (left, right) = if *left_node_index < *right_node_index {
+            let (left_side, right_side) = self.nodes.split_at_mut(*right_node_index);
+            (&mut left_side[*left_node_index], &mut right_side[0])
+        } else {
+            let (left_side, right_side) = self.nodes.split_at_mut(*left_node_index);
+            (&mut right_side[0], &mut left_side[*right_node_index])
+        };
+
+        if left.value.is_some() && right.value.is_some() {
+            left.value = None;
+            right.value = None;
+            if let Some(domino) = self.dominoes.get_mut(*domino_idx) {
+                domino.valid = true;
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn max_score(&self) -> u32 {
+        1 + self.regions.len() as u32 * REGION_WIN_SCORE
+    }
+
+    pub fn score_all_regions(&self) -> u32 {
+        let mut score = 1;
+        for region in self.regions.iter() {
+            let region_score = region.get_validity(&self.nodes) as u32;
+
+            if region_score == 0 {
+                return 0;
+            }
+
+            score += region_score;
+        }
+        score
+    }
+
+    pub fn node_empty(&self, idx: &Option<usize>) -> Option<(&Node, usize)> {
+        if let Some(node) = idx.and_then(|idx| self.nodes.get(idx))
+            && node.value.is_none()
+        {
+            Some((node, idx.unwrap()))
+        } else {
+            None
+        }
+    }
+
+    pub fn build_other_half(&self, idx: &Option<usize>, domino_value: u32) -> Option<MoveHalf> {
+        if let Some((node, node_idx)) = self.node_empty(idx) {
+            Some(MoveHalf {
+                value: domino_value,
+                node_index: node_idx,
+                region: node.region_idx,
+            })
+        } else {
+            None
+        }
+    }
+
+    pub fn calculate_moves(&self) -> Vec<Move> {
+        let mut moves = vec![];
+        for (domino_idx, domino) in self.dominoes.iter().enumerate() {
+            if !domino.valid {
+                continue;
+            }
+            for (node_idx, node) in self.nodes.iter().enumerate() {
+                let mut is_isolated = true;
+                let Node {
+                    left,
+                    up,
+                    right,
+                    down,
+                    x: _x,
+                    y: _y,
+                    value,
+                    region_idx,
+                } = node;
+                if value.is_some() {
+                    continue;
+                }
+                let left_half = MoveHalf {
+                    value: domino.left,
+                    node_index: node_idx,
+                    region: *region_idx,
+                };
+                if let Some(move_half) = self.build_other_half(left, domino.right) {
+                    moves.push(Move {
+                        left: left_half,
+                        right: move_half,
+                        domino_idx,
+                    });
+                    is_isolated = false;
+                }
+                if let Some(move_half) = self.build_other_half(up, domino.right) {
+                    moves.push(Move {
+                        left: left_half,
+                        right: move_half,
+                        domino_idx,
+                    });
+                    is_isolated = false;
+                }
+                if let Some(move_half) = self.build_other_half(right, domino.right) {
+                    moves.push(Move {
+                        left: left_half,
+                        right: move_half,
+                        domino_idx,
+                    });
+                    is_isolated = false;
+                }
+                if let Some(move_half) = self.build_other_half(down, domino.right) {
+                    moves.push(Move {
+                        left: left_half,
+                        right: move_half,
+                        domino_idx,
+                    });
+                    is_isolated = false;
+                }
+                if is_isolated {
+                    return vec![];
+                }
+            }
+        }
+
+        moves
+    }
+
+    pub fn regions_impossible(&self, best: &Move) -> bool {
+        let Move {
+            left:
+                MoveHalf {
+                    value: _left_value,
+                    node_index: _left_node_index,
+                    region: left_region,
+                },
+            right:
+                MoveHalf {
+                    value: _right_value,
+                    node_index: _right_node_index,
+                    region: right_region,
+                },
+            domino_idx: _domino_idx,
+        } = best;
+        if let (Some(left), Some(right)) = (
+            self.regions.get(*left_region),
+            self.regions.get(*right_region),
+        ) {
+            left.get_validity(&self.nodes) == RegionValidity::Invalid
+                && right.get_validity(&self.nodes) == RegionValidity::Invalid
+        } else {
+            true
         }
     }
 }
