@@ -11,29 +11,7 @@ import {
   type Region,
 } from "@/components/types/domino.ts";
 
-// const DOMINO_SIZE = 100;
-
 const dominoes = ref<DominoPosition[]>([]);
-// let index = 0;
-// for (let i = 0; i <= 9; i++) {
-//   for (let j = 0; j <= i; j++) {
-//     const newDomino: Domino = {
-//       id: index,
-//       left: i,
-//       right: j,
-//       rotation: Rotation.Right,
-//     };
-//     const newPosition: Position = {
-//       x: 100 + (index % 8) * 200,
-//       y: 100 + 100 * Math.floor(index / 8),
-//     };
-//     dominoes.value.push({ domino: newDomino, position: newPosition, isValid: true });
-//     index++;
-//   }
-// }
-// while (dominoes.value.length > 5) {
-//   dominoes.value.splice(Math.round(Math.random() * dominoes.value.length), 1);
-// }
 
 dominoes.value.push({
   domino: { id: 1, left: 0, right: 3, rotation: Rotation.Right },
@@ -83,8 +61,8 @@ function hslToHex(h: number, s: number, l: number): string {
 
 function generateRandomMutedHex(): string {
   const hue = Math.floor(Math.random() * 361);
-  const saturation = Math.floor(Math.random() * 21) + 20; // 20% to 40%
-  const lightness = Math.floor(Math.random() * 21) + 45; // 45% to 65%
+  const saturation = Math.floor(Math.random() * 21) + 20;
+  const lightness = Math.floor(Math.random() * 21) + 45;
 
   return hslToHex(hue, saturation, lightness);
 }
@@ -273,6 +251,7 @@ function dominoChangedCallback(center: Position, dominoSize: number, dominoIdx: 
   const gridSquares = calculateGridSquares(center, movedDomino.rotation, dominoSize);
   const currentDominoPlacement = dominoPlacements[dominoIdx];
   if (currentDominoPlacement) {
+    alert("REMOVED" + movedDomino)
     removeDomino(currentDominoPlacement);
   }
   const intersectsAnyOther = placeDomino(gridSquares, movedDomino);
