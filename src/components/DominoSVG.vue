@@ -145,7 +145,6 @@ svg {
 
 .bg {
   fill: var(--domino-fill);
-  /*stroke: var(--domino-stroke);*/
   opacity: 0.9;
   stroke-width: 4;
   rx: 12;
