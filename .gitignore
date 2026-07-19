@@ -37,3 +37,13 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Lesson code
+MISSION.md
+NOTES.md
+RESOURCES.md
+/lessons/
+/assets/
+/learning-records/
+/reference/
+

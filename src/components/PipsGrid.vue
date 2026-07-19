@@ -27,19 +27,18 @@ const labelMap = computed(() => {
   const map: { [key: string]: string } = {};
 
   for (const region of regions.value.filter((region) => region.regionType != RegionType.Blank)) {
-    const sorted = region.squares.sort((a, b) => Number(a.x > b.x && a.y > b.y));
+    const sorted = [...region.squares].sort((a, b) => a.y - b.y || a.x - b.x);
     const maxSquare = sorted[sorted.length - 1];
     if (maxSquare) {
       map[`${maxSquare!.x}-${maxSquare!.y}`] = regionToString(region);
     }
   }
-  console.log(map);
   return map;
 });
 
 const gridContainer = ref<HTMLElement | null>(null);
 
-const getRandomHexColor = (): string => {
+const _getRandomHexColor = (): string => {
   const val = ["#ffffff", "#555555"][Math.floor(Math.random() * 2)];
   return val ? val : "#3523324";
 };

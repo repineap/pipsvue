@@ -37,7 +37,7 @@ export interface Region {
   regionType: RegionType;
   regionValue: number;
   regionColor: string;
-  isValid?: boolean;
+  isValid: boolean;
 }
 
 export function regionToString(region: Region): string {

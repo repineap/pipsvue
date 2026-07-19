@@ -128,18 +128,18 @@ const handleClick = () => {
         height="100%"
         style="user-select: none; -webkit-user-drag: none"
       />
-      <div ref="centerDot" style="position: fixed; top: 50%; left: 25%"></div>
+      <div ref="centerDot" style="position: absolute; top: 50%; left: 25%"></div>
     </div>
   </div>
 </template>
 
 <style scoped>
 .domino {
-  width: 2 * var(--domino-size);
+  width: calc(2 * var(--domino-size));
   height: var(--domino-size);
   transform-origin: 25% 50%;
   transition: transform 0.1s linear;
-  position: fixed;
+  position: relative;
   cursor: pointer;
   user-select: none;
   z-index: 1;

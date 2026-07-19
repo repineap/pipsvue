@@ -59,7 +59,7 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${f(0)}${f(8)}${f(4)}`;
 }
 
-function generateRandomMutedHex(): string {
+function _generateRandomMutedHex(): string {
   const hue = Math.floor(Math.random() * 361);
   const saturation = Math.floor(Math.random() * 21) + 20;
   const lightness = Math.floor(Math.random() * 21) + 45;
@@ -83,6 +83,7 @@ regions.value.push({
   regionType: RegionType.SumsTo,
   regionValue: 3,
   regionColor: popRandomColor(),
+  isValid: false,
 });
 
 regions.value.push({
@@ -90,6 +91,7 @@ regions.value.push({
   regionType: RegionType.LessThan,
   regionValue: 6,
   regionColor: popRandomColor(),
+  isValid: false,
 });
 
 regions.value.push({
@@ -100,6 +102,7 @@ regions.value.push({
   regionType: RegionType.Blank,
   regionValue: -1,
   regionColor: "#555555",
+  isValid: false,
 });
 
 regions.value.push({
@@ -111,6 +114,7 @@ regions.value.push({
   regionType: RegionType.AllEqual,
   regionValue: -1,
   regionColor: popRandomColor(),
+  isValid: false,
 });
 
 regions.value.push({
@@ -122,6 +126,7 @@ regions.value.push({
   regionType: RegionType.SumsTo,
   regionValue: 8,
   regionColor: popRandomColor(),
+  isValid: false,
 });
 
 const rows =
@@ -196,11 +201,11 @@ function placeDomino(gridSquares: DominoCoordinate, domino: Domino): boolean {
     grid.value[left.y]![left.x] != -1 ||
     grid.value[right.y]![right.x] != -1
   ) {
-    return true;
+    return false;
   }
   grid.value[left.y]![left.x] = domino.left;
   grid.value[right.y]![right.x] = domino.right;
-  return false;
+  return true;
 }
 
 const validateRegions = (): boolean => {
@@ -236,7 +241,7 @@ const validateRegions = (): boolean => {
         break;
       }
     }
-    regionsValid = region.isValid || false;
+    regionsValid = regionsValid && region.isValid;
   }
   return regionsValid;
 };
@@ -251,14 +256,13 @@ function dominoChangedCallback(center: Position, dominoSize: number, dominoIdx: 
   const gridSquares = calculateGridSquares(center, movedDomino.rotation, dominoSize);
   const currentDominoPlacement = dominoPlacements[dominoIdx];
   if (currentDominoPlacement) {
-    alert("REMOVED" + movedDomino)
     removeDomino(currentDominoPlacement);
   }
-  const intersectsAnyOther = placeDomino(gridSquares, movedDomino);
-  if (!intersectsAnyOther) {
+  const placed = placeDomino(gridSquares, movedDomino);
+  if (placed) {
     dominoPlacements[dominoIdx] = gridSquares;
   }
-  movedDominoPos.isValid = !intersectsAnyOther;
+  movedDominoPos.isValid = placed;
   if (validateRegions()) alert("YOU WIN");
 }
 </script>
