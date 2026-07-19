@@ -127,47 +127,41 @@ const rightPipCoordinates = computed(() => {
 </script>
 
 <style scoped>
-.bg {
-  opacity: 0.9;
-  fill: #ffffff;
-  stroke: #000000;
-  stroke-width: 4;
-  rx: 12;
-}
-.line {
-  stroke: #000000;
-  stroke-width: 2;
-}
-.pip {
-  fill: #000000;
+svg {
+  --domino-fill: #ffffff;
+  --domino-stroke: #000000;
 }
 
-.valid-bg {
-  stroke: #000000;
-}
-
-@media (prefers-color-scheme: light) {
-  .bg {
-    opacity: 0.9;
-    fill: #202120;
-    stroke: #d3d3d3;
-    stroke-width: 4;
-    rx: 12;
-  }
-  .line {
-    stroke: #d3d3d3;
-    stroke-width: 2;
-  }
-  .pip {
-    fill: #d3d3d3;
-  }
-
-  .valid-bg {
-    stroke: #d3d3d3;
+@media (prefers-color-scheme: dark) {
+  svg {
+    --domino-fill: #202120;
+    --domino-stroke: #d3d3d3;
   }
 }
 
 .invalid-bg {
   stroke: darkred;
 }
+
+.bg {
+  fill: var(--domino-fill);
+  /*stroke: var(--domino-stroke);*/
+  opacity: 0.9;
+  stroke-width: 4;
+  rx: 12;
+}
+
+.line {
+  stroke: var(--domino-stroke);
+  stroke-width: 2;
+}
+
+.pip {
+  fill: var(--domino-stroke);
+}
+
+.valid-bg {
+  stroke: var(--domino-stroke);
+}
+
 </style>
