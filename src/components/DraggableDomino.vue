@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from "vue";
 import { useDraggable } from "@vueuse/core";
-import { Rotation, type DominoPosition, type Position } from "@/components/types/domino.ts";
+import {  type DominoPosition, type Position } from "@/components/types/domino.ts";
 import DominoSVG from "@/components/DominoSVG.vue";
 const dominoModel = defineModel<DominoPosition>({
   required: true,
@@ -22,8 +22,6 @@ let dominoSize = 0;
 
 const snap = (val: number) => Math.round(val / dominoSize) * dominoSize;
 
-const wasDragged = ref(false);
-
 const emit = defineEmits<{
   dominoChanged: [Position, number];
 }>();
@@ -37,7 +35,6 @@ const { style, position } = useDraggable(el, {
   initialValue: dominoModel.value.position,
   onStart(position, event) {
     startClientPosition = { x: event.clientX, y: event.clientY };
-    wasDragged.value = false;
   },
   async onEnd(position, event) {
     const { width, height } = dominoDiv.value!.getBoundingClientRect();
@@ -45,9 +42,7 @@ const { style, position } = useDraggable(el, {
     const deltaX = Math.abs(event.clientX - startClientPosition.x);
     const deltaY = Math.abs(event.clientY - startClientPosition.y);
 
-    if (deltaX > 2 || deltaY > 2) {
-      wasDragged.value = true;
-    } else {
+    if (deltaX < 2 && deltaY < 2) {
       domino.value.rotation = (domino.value.rotation + 1) % 4;
       rotationVal.value += 1;
     }
@@ -82,23 +77,6 @@ const calculateCenter = (): Position => {
     x,
     y,
   };
-  // const { x, y } = position;
-  // const { width, height } = dominoElement.getBoundingClientRect();
-  // console.log(x, y, width, height);
-  // if (domino.value.rotation == Rotation.Right || domino.value.rotation == Rotation.Left) {
-  //   center.x = x + width / 4;
-  //   center.y = x + height / 2;
-  // } else {
-  //   center.x = x + width / 4;
-  //   center.y = x + height / 2;
-  // }
-};
-
-const handleClick = () => {
-  if (wasDragged.value) {
-    wasDragged.value = false;
-    return;
-  }
 };
 </script>
 
@@ -110,7 +88,6 @@ const handleClick = () => {
       `opacity: ${dominoModel.isValid ? 0.9 : 1}`,
       // `z-index: ${dominoModel.isValid ? 0 : 9999}`,
     ]"
-    @click="handleClick"
     class="draggable-wrapper"
   >
     <div

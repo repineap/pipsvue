@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { regionToString, RegionType, type Position, type Region } from "./types/domino";
+import { regionToString, RegionType, type Region } from "./types/domino";
 
 const grid = defineModel<number[][]>("grid", { required: true });
 const regions = defineModel<Region[]>("regions", { required: true });
@@ -37,11 +37,6 @@ const labelMap = computed(() => {
 });
 
 const gridContainer = ref<HTMLElement | null>(null);
-
-const _getRandomHexColor = (): string => {
-  const val = ["#ffffff", "#555555"][Math.floor(Math.random() * 2)];
-  return val ? val : "#3523324";
-};
 
 const inSameRegion = (x: number, y: number, color: string): boolean => {
   return (colorMap.value[y]?.[x] || "EMPTY") !== color;

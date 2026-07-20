@@ -11,37 +11,101 @@ import {
   type Region,
 } from "@/components/types/domino.ts";
 
-const dominoes = ref<DominoPosition[]>([]);
+function createGame(): { readonly dominoes: DominoPosition[], readonly regions: Region[] } {
+  const dominoes: DominoPosition[] = [
+    {
+      domino: { id: 1, left: 0, right: 3, rotation: Rotation.Right },
+      position: { x: 300, y: 700 },
+      isValid: true,
+    },
+    {
+      domino: { id: 2, left: 5, right: 6, rotation: Rotation.Right },
+      position: { x: 500, y: 700 },
+      isValid: true,
+    },
+    {
+      domino: { id: 3, left: 3, right: 6, rotation: Rotation.Right },
+      position: { x: 700, y: 700 },
+      isValid: true,
+    },
+    {
+      domino: { id: 4, left: 4, right: 4, rotation: Rotation.Right },
+      position: { x: 900, y: 700 },
+      isValid: true,
+    },
+    {
+      domino: { id: 5, left: 3, right: 3, rotation: Rotation.Right },
+      position: { x: 1100, y: 700 },
+      isValid: true,
+    },
+  ];
 
-dominoes.value.push({
-  domino: { id: 1, left: 0, right: 3, rotation: Rotation.Right },
-  position: { x: 300, y: 700 },
-  isValid: true,
-});
+  const colors: string[] = [];
+  for (let hue = 0; hue < 360; hue += 15) {
+    colors.push(hslToHex(hue, 50, 50));
+  }
 
-dominoes.value.push({
-  domino: { id: 2, left: 5, right: 6, rotation: Rotation.Right },
-  position: { x: 500, y: 700 },
-  isValid: true,
-});
+  const popRandomColor = (): string => {
+    const poppedArray = colors.splice(Math.floor(Math.random() * colors.length), 1);
+    return poppedArray[0]!;
+  };
 
-dominoes.value.push({
-  domino: { id: 3, left: 3, right: 6, rotation: Rotation.Right },
-  position: { x: 700, y: 700 },
-  isValid: true,
-});
+  const regions: Region[] = [
+    {
+      squares: [{ x: 2, y: 0 }],
+      regionType: RegionType.SumsTo,
+      regionValue: 3,
+      regionColor: popRandomColor(),
+      isValid: false,
+    },
+    {
+      squares: [{ x: 1, y: 0 }],
+      regionType: RegionType.LessThan,
+      regionValue: 6,
+      regionColor: popRandomColor(),
+      isValid: false,
+    },
+    {
+      squares: [
+        { x: 0, y: 0 },
+        { x: 3, y: 0 },
+      ],
+      regionType: RegionType.Blank,
+      regionValue: -1,
+      regionColor: "#555555",
+      isValid: false,
+    },
+    {
+      squares: [
+        { x: 0, y: 1 },
+        { x: 0, y: 2 },
+        { x: 1, y: 2 },
+      ],
+      regionType: RegionType.AllEqual,
+      regionValue: -1,
+      regionColor: popRandomColor(),
+      isValid: false,
+    },
+    {
+      squares: [
+        { x: 2, y: 2 },
+        { x: 3, y: 2 },
+        { x: 3, y: 3 },
+      ],
+      regionType: RegionType.SumsTo,
+      regionValue: 8,
+      regionColor: popRandomColor(),
+      isValid: false,
+    },
+  ];
 
-dominoes.value.push({
-  domino: { id: 4, left: 4, right: 4, rotation: Rotation.Right },
-  position: { x: 900, y: 700 },
-  isValid: true,
-});
+  return { dominoes, regions };
+}
 
-dominoes.value.push({
-  domino: { id: 5, left: 3, right: 3, rotation: Rotation.Right },
-  position: { x: 1100, y: 700 },
-  isValid: true,
-});
+const game = createGame();
+
+const dominoes = ref(game.dominoes);
+const regions = ref(game.regions);
 
 function hslToHex(h: number, s: number, l: number): string {
   s /= 100;
@@ -58,76 +122,6 @@ function hslToHex(h: number, s: number, l: number): string {
 
   return `#${f(0)}${f(8)}${f(4)}`;
 }
-
-function _generateRandomMutedHex(): string {
-  const hue = Math.floor(Math.random() * 361);
-  const saturation = Math.floor(Math.random() * 21) + 20;
-  const lightness = Math.floor(Math.random() * 21) + 45;
-
-  return hslToHex(hue, saturation, lightness);
-}
-
-const colors: string[] = [];
-for (let hue = 0; hue < 360; hue += 15) {
-  colors.push(hslToHex(hue, 50, 50));
-}
-
-const popRandomColor = (): string => {
-  const poppedArray = colors.splice(Math.floor(Math.random() * colors.length), 1);
-  return poppedArray[0]!;
-};
-
-const regions = ref<Region[]>([]);
-regions.value.push({
-  squares: [{ x: 2, y: 0 }],
-  regionType: RegionType.SumsTo,
-  regionValue: 3,
-  regionColor: popRandomColor(),
-  isValid: false,
-});
-
-regions.value.push({
-  squares: [{ x: 1, y: 0 }],
-  regionType: RegionType.LessThan,
-  regionValue: 6,
-  regionColor: popRandomColor(),
-  isValid: false,
-});
-
-regions.value.push({
-  squares: [
-    { x: 0, y: 0 },
-    { x: 3, y: 0 },
-  ],
-  regionType: RegionType.Blank,
-  regionValue: -1,
-  regionColor: "#555555",
-  isValid: false,
-});
-
-regions.value.push({
-  squares: [
-    { x: 0, y: 1 },
-    { x: 0, y: 2 },
-    { x: 1, y: 2 },
-  ],
-  regionType: RegionType.AllEqual,
-  regionValue: -1,
-  regionColor: popRandomColor(),
-  isValid: false,
-});
-
-regions.value.push({
-  squares: [
-    { x: 2, y: 2 },
-    { x: 3, y: 2 },
-    { x: 3, y: 3 },
-  ],
-  regionType: RegionType.SumsTo,
-  regionValue: 8,
-  regionColor: popRandomColor(),
-  isValid: false,
-});
 
 const rows =
   regions.value.reduce(
