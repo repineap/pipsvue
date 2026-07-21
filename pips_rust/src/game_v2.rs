@@ -62,6 +62,7 @@ pub struct Node {
 #[derive(Debug)]
 pub enum RegionType {
     Same,
+    AllDifferent,
     GreaterThan(u32),
     LessThan(u32),
     SumsTo(u32),
@@ -72,6 +73,7 @@ impl Into<RegionType> for (String, u32) {
     fn into(self) -> RegionType {
         match self.0.as_str() {
             "=" => RegionType::Same,
+            "!=" => RegionType::AllDifferent,
             ">" => RegionType::GreaterThan(self.1),
             "<" => RegionType::LessThan(self.1),
             "+" => RegionType::SumsTo(self.1),
@@ -106,7 +108,10 @@ impl Region {
             .collect();
         let filled_region = values.len() == self.squares.len();
         let condition_met = match self.region_type {
-            RegionType::Same => values.iter().any(|x| x != &values[0]),
+            RegionType::Same => values.iter().all(|x| x == &values[0]),
+            RegionType::AllDifferent => {
+                values.iter().all(|x| values.iter().filter(|y| *y != x).count() == 1)
+            },
             RegionType::GreaterThan(v) => values.iter().sum::<u32>() > v,
             RegionType::LessThan(v) => values.iter().sum::<u32>() < v,
             RegionType::SumsTo(v) => values.iter().sum::<u32>() == v,
