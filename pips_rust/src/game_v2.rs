@@ -99,7 +99,7 @@ pub struct Region {
 }
 
 impl Region {
-    pub fn get_validity(&self, graph_nodes: &Vec<Node>) -> RegionValidity {
+    pub fn get_validity(&self, graph_nodes: &[Node]) -> RegionValidity {
         let values: Vec<u32> = self
             .squares
             .iter()
@@ -408,5 +408,48 @@ impl PipsGraph {
         } else {
             true
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn create_node(v: Option<u32>) -> Node {
+        Node { x: 0, y: 0, value: v, region_idx: 0, left: None, up: None, right: None, down: None }
+    }
+
+    fn create_region(region_type: RegionType, values: &[Option<u32>]) -> (Region, Vec<Node>) {
+        (Region { region_type, squares: (0..values.len()).collect::<Vec<_>>() }, values.iter().map(|v| {create_node(*v) }).collect::<Vec<_>>())
+    }
+
+    fn create_empty_region(region_type: RegionType) -> (Region, Vec<Node>) {
+        create_region(region_type, &[None, None])
+    }
+
+    fn create_partial_region(region_type: RegionType) -> (Region, Vec<Node>) {
+        create_region(region_type, &[Some(1), None, None])
+    }
+
+    fn create_full_region(region_type: RegionType) -> (Region, Vec<Node>) {
+        create_region(region_type, &[Some(1), Some(2), Some(3)])
+    }
+
+    #[test]
+    fn empty_region_is_possible() {
+        let (region, nodes) = create_empty_region(RegionType::Blank);
+        assert!(region.get_validity(&nodes) == RegionValidity::Possible)
+    }
+
+    #[test]
+    fn partial_region_is_possible() {
+        let (region, nodes) = create_partial_region(RegionType::Blank);
+        assert!(region.get_validity(&nodes) == RegionValidity::Possible)
+    }
+
+    #[test]
+    fn full_region_is_solved() {
+        let (region, nodes) = create_full_region(RegionType::Blank);
+        assert!(region.get_validity(&nodes) == RegionValidity::Solved)
     }
 }
